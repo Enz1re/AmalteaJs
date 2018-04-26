@@ -1,0 +1,12 @@
+<div>Hello, {presenter.text}! Glad to see you {presenter.text}<p class="block"></p></div>
+<p>SIMPLE FORM</p>
+<form name="simpleForm" am-form="presenter.$model.SecondaryModel">
+	<input name="name">
+	<input name="age">
+	<select name="status"></select>
+</form>
+<p>DYNAMIC FORM</p>
+<form name="dynamicForm" am-dynamic-form="presenter.$model.SecondaryModel">
+	
+</form>
+<button am-click="presenter.printModel">Print</button>
