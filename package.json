@@ -1,0 +1,22 @@
+{
+	"name": "amalteajs",
+	"title": "AmalteaJS",
+	"description": "JavaScript library for building MVP web applications",
+	"version": "1.0.0",
+	"main": "dist/amaltea.js",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Enz1re/AmalteaJS"
+	},
+	"license": "MIT",
+	"dependencies": {},
+	"devDependencies": {
+		"requirejs": "^2.3.5",
+		"webpack": "^3.4.1",
+		"uglifyjs-webpack-plugin": "1.0.0"
+	},
+	"scripts": {
+		"build": "npm install && webpack",
+		"webpack": "webpack --config webpack.config.js"
+	}
+}

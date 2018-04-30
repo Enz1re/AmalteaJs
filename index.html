@@ -3,21 +3,11 @@
 <head>
 	<title>JS</title>
 	<meta charset="utf-8">
-	<script src="amaltea.js"></script>
-	<script src="http.js"></script>
-	<script src="am-table.js"></script>
-	<script src="am-list.js"></script>
-	<script src="am-form.js"></script>
-	<script src="cache.js"></script>
-	<script src="viewCompilation.js"></script>
-	<script src="presenterCompilation.js"></script>
-	<script src="$view.js"></script>
-	<script src="$model.js"></script>
-	<script src="routing.js"></script>
 	<link rel="stylesheet" href="style.css">
+	<script data-main="require.config.js" src="require.js"></script>
 </head>
 <body>
-	<div id="bind" view-id="2">
+	<div id="bind">
 		Hello, {presenter.text}. My name is {presenter.text}!
 	</div>
 	<div id="main">
@@ -32,14 +22,5 @@
 	</div>
 	<my-tag-2></my-tag-2>
 	<hr />
-	<img view-id="2" am-src="presenter.src">
-	<form view-id="2" action="localhost:8080/Foo" method="POST">
-		<input view-id="2" type="text" am-value="presenter.text">
-		<input view-id="2" type="text" am-value="presenter.text">
-		<input view-id="2" type="number" am-value="presenter.number">
-		<div view-id="2">{presenter.text}</div>
-		<div view-id="2">{presenter.number}</div>
-		<button view-id="2" am-click="presenter.onGoClick">GO!</button>
-	</form>
 </body>
 </html>

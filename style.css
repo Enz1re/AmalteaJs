@@ -1,0 +1,12 @@
+div {
+	display: block;
+	font-size: 14px;
+	color: red;
+}
+
+.block {
+	display: block;
+	border: 1px black solid;
+	width: 100px;
+	height: 100px;
+}

@@ -1,31 +1,46 @@
-var view = amaltea.view({
-    tagName: 'my-tag',
-    template: "views/main.html",
-    stylesheet: "views/style.css"
-});
+"use strict";
 
-var http = amaltea.object('sos', { kek: 420 });
+define(["amaltea"], function () {
+    var view1 = amaltea.view({
+        tagName: "my-tag",
+        template: "layout/myTag.html",
+    });
 
-var presenter = view.presenter('mainPresenter', function ($view, $model, http) {
-    return {
-        text: "",
+    var validator = amaltea.object('validator', function () {
+        return {
+            validate: function (value) {
+                return Number.parseFloat(value) < 0.5 || value === "";
+            }
+        };
+    });
 
-        initText: function () {
-            this.text = "Hello";
+    var presenter1 = view1.presenter('mainPresenter', function ($view, $model, validator) {
+        return {
+            src: "https://i.ytimg.com/vi/4-oDmlYgrNY/hqdefault.jpg",
+
+            onclick1: function (e) {
+                this.$model.User.name = Math.random() + "";
+            },
+
+            _onInit: function () {
+                this.$model.User.onValueChanged(function (model, property, value) {
+                    return this.validator.validate(value);
+                });
+            }
         }
-    };
-}, ['$view', '$model', 'http']);
+    }, ['$view', '$model', 'validator']);
 
-var userModel = presenter.model('User', {
-    username: "text",
-    password: "text",
-    email: "text"
+    var userModel = presenter1.model('User', {
+        name: "text",
+        phone: "number"
+    });
+
+    var mainModule = amaltea.module({
+        name: "main",
+        views: [view1],
+        dependencies: [validator],
+        submodules: [],
+    });
+
+    amaltea.run(mainModule);
 });
-
-var taskModel = presenter.model('Task', {
-    id: "number",
-    name: "text",
-    desciption: "text"
-});
-
-var module = amaltea.module("main", [view], [http]);
