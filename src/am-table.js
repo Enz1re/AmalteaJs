@@ -1,6 +1,6 @@
-"use strict";
-
 define([], function () {
+    "use strict";
+
     function AmTableRow(rowData) {
         var cells = rowData.getElementsByTagName('td');
 

@@ -1,6 +1,6 @@
-"use strict";
-
 define(["src/model"], function (model) {
+    "use strict";
+
     function presenter(name, presenterFn, dependencies) {
         this.p = { name: name, constructor: presenterFn };
         this.d = dependencies;

@@ -1,6 +1,6 @@
-"use strict";
-
 define([], function () {
+    "use strict";
+
     function AmList(listElement) {
         this._list = listElement;
         var elements = listElement.getElementsByTagName('li');

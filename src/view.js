@@ -1,11 +1,11 @@
-"use strict";
-
 define(["src/presenter"], function (presenter) {
+    "use strict";
+
     function view(viewObject) {
         this.tagName = viewObject.tagName;
         this.template = viewObject.template;
-        if (viewObject.stylesheetUrl) {
-            this.stylesheet = viewObject.stylesheetUrl;
+        if (viewObject.stylesheet) {
+            this.stylesheet = viewObject.stylesheet;
         }
 
         this.presenter = function (name, presenterFn, dependencies) {

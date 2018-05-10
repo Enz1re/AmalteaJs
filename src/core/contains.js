@@ -1,6 +1,6 @@
-"use strict";
-
 define([], function () {
+    "use strict";
+
 	var contains = function (array, value, comparerFn) {
         comparerFn = comparerFn || function (elem, value) { return elem === value; }
 

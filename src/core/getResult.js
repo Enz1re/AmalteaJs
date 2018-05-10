@@ -1,6 +1,6 @@
-"use strict";
-
 define(["src/core/getObject"], function (getObject) {
+    "use strict";
+
     var getResult = function (mainObject, callString) {
         const objectData = getObject(mainObject, callString);
         const object = objectData.object;

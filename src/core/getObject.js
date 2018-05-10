@@ -1,6 +1,6 @@
-"use strict";
-
 define([], function () {
+    "use strict";
+
     var getObject = function (mainObject, callString) {
         var object;
         var prev = mainObject;

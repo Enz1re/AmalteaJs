@@ -1,6 +1,6 @@
-"use strict";
-
 define([], function () {
+    "use strict";
+
     var CacheObject = function (capacity) {
         this.capacity = capacity;
         this.map = Object.create(null);

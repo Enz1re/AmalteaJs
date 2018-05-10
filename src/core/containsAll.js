@@ -1,6 +1,6 @@
-"use strict";
-
 define(["src/core/contains"], function (contains) {
+    "use strict";
+
     var containsAll = function (sourceArray, destinationArray, comparerFn) {
         comparerFn = comparerFn || function (elem, value) { return elem === value; }
 

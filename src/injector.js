@@ -1,11 +1,11 @@
-"use strict";
-
 define([
     "src/$view",
     "src/$model",
 
     "src/core/shallowCopy"
 ], function ($view, $model, shallowCopy) {
+    "use strict";
+
     var arrow = true;
     var funcArgs = arrow ? /^(function)?\s*[^\(]*\(\s*([^\)]*)\)/m : /^(function)\s*[^\(]*\(\s*([^\)]*)\)/m;
     var funcArgSplit = /,/;
@@ -49,12 +49,12 @@ define([
             // resolve $view and $model separately, because they must have definite order
             var index;
             if ((index = _dependencies.indexOf('$model')) !== -1) {
-                object[constructorArguments[index]] = new $model(modelList, node, object);
+                object[constructorArguments[index]] = new $model(modelList, node, object, constructorArguments[index]);
                 _dependencies.splice(index, 1);
                 constructorArguments.splice(index, 1);
             }
             if ((index = _dependencies.indexOf('$view')) !== -1) {
-                object[constructorArguments[index]] = new $view(node, object);
+                object[constructorArguments[index]] = new $view(modelList, node, object);
                 _dependencies.splice(index, 1);
                 constructorArguments.splice(index, 1);
             }
@@ -64,7 +64,7 @@ define([
                     throw new Error("Duplicate dependency: '" + _dependencies[i] + "' in " + objName);
                 }
 
-                object[constructorArguments[i]] = dependencyDict[_dependencies[i]];
+                object[constructorArguments[i]] = dependencyDict[_dependencies[i]].value;
             }
 
             return object;
@@ -75,7 +75,7 @@ define([
                 throw new Error("No such dependency: '" + depName + "'");
             }
 
-            return dependencyDict[depName];
+            return dependencyDict[depName].value;
         };
 
         this.tryGet = function (depName, result) {
@@ -83,7 +83,7 @@ define([
                 return false;
             }
 
-            result = dependencyDict[depName];
+            result = dependencyDict[depName].value;
             return true;
         };
     }

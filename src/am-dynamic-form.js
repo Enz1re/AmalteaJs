@@ -1,6 +1,6 @@
-"use strict";
-
 define([], function () {
+    "use strict";
+
     const formElements = {
         "INPUT": true,
         "SELECT": true,
@@ -142,24 +142,21 @@ define([], function () {
     }
 
     function AmDynamicForm(formNode, model) {
-        for (var prop of Object.getOwnPropertyNames(model._inner)) {
-            if (!model._inner[prop].type) {
-                throw new Error("Type is missing in form description.");
-            }
-        }
-
         var element;
-        var fields = Object.getOwnPropertyNames(model._inner).map(function (prop) { return { name: prop, description: model._inner[prop] }; });
+        var fields = Object.getOwnPropertyNames(model).map(function (prop) { return { name: prop, description: model[prop] }; });
         var am = Array.prototype.slice.call(formNode.attributes).find(function (element, index, array) {
             return element.name.match(amRegex);
         });
+
         var viewId = formNode.getAttribute('view-id');
+        var amIndex = formNode.getAttribute('am-index');
         var modelName = formNode.getAttribute('am-dynamic-form');
         for (var field of fields) {
             element = createFormField(field.description.type, field.description.value, field.description.values);
             element.name = field.name;
             element.setAttribute(am.name, '');
             element.setAttribute('view-id', viewId);
+            element.setAttribute('am-index', amIndex);
             element.setAttribute("am-value", modelName + "." + field.name);
             formNode.appendChild(element);
         }

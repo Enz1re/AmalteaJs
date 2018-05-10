@@ -1,6 +1,6 @@
-"use strict";
-
 define(["src/core/mergeArrays"], function (mergeArrays) {
+    "use strict";
+
     var merge = function (src, obj) {
         var srcType = typeof src;
         if (srcType !== typeof obj) {

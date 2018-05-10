@@ -1,4 +1,8 @@
-<div>Hello, {presenter.text}! Glad to see you {presenter.text}<p class="block"></p></div>
+<p class="block">
+	<div>Name: {presenter.$model.SecondaryModel.name}</div>
+	<div>Age: {presenter.$model.SecondaryModel.age}</div>
+	<div>Name: {presenter.$model.SecondaryModel.status}</div>
+</p>
 <p>SIMPLE FORM</p>
 <form name="simpleForm" am-form="presenter.$model.SecondaryModel">
 	<input name="name">

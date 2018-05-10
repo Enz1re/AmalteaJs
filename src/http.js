@@ -1,6 +1,6 @@
-"use strict";
-
 define([], function () {
+    "use strict";
+
     function lowercaseMatch(elem1, elem2) {
         return elem1.toLowerCase() === elem2.toLowerCase();
     }

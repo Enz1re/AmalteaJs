@@ -1,6 +1,6 @@
-"use strict";
+define(["src/core/create"], function (create) {
+    "use strict";
 
-define([], function () {
     const formElements = {
         "INPUT": true,
         "SELECT": true,
@@ -132,16 +132,13 @@ define([], function () {
     }
 
     function AmForm(formNode, model) {
-        for (var prop of Object.getOwnPropertyNames(model._inner)) {
-            if (!model._inner[prop].type) {
-                throw new Error("Type is missing in form description.");
-            }
-        }
-
         var formChildNodes = formNode.children;
-        var matches = Object.assign({}, model._inner);
-        var propName;
+        var matches = create();
+        Object.getOwnPropertyNames(model).forEach(function (prop) {
+            matches[prop] = true;
+        });
 
+        var propName;
         var modelName = formNode.getAttribute('am-form');
         for (var formElement of formChildNodes) {
             propName = formElement.name;
@@ -151,11 +148,11 @@ define([], function () {
             if (!(formElement.tagName in formElements)) {
                 throw new Error(formElement.tagName.toLowerCase() + " is not a valid form element.");
             }
-            if (matches.hasOwnProperty(propName)) {
+            if (matches[propName]) {
                 delete matches[propName];
-                resolveFormType(formElement, model._inner[propName].type, model._inner[propName].value, model._inner[propName].values);
+                resolveFormType(formElement, model[propName].type, model[propName].value, model[propName].values);
                 formElement.setAttribute('am-value', modelName + '.' + propName);
-                this[propName] = model._inner[propName];
+                this[propName] = model[propName];
             } else {
                 throw new Error("No such property: " + propName);
             }

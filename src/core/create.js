@@ -1,6 +1,6 @@
-"use strict";
-
 define([], function () {
+    "use strict";
+
     var create = function (obj, proto) {
         if (!obj) {
             return Object.create(proto || null);
