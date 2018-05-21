@@ -1,7 +1,8 @@
 define([
-    "src/core/mergeCopy",
-    "src/core/mergeArrays"
-], function (mergeCopy, mergeArrays) {
+    "src/core/merge",
+	"src/core/getObject",
+	"src/core/getResult"
+], function (merge, getObject, getResult) {
     "use strict";
 
     var functionRegex = /.+\(([\w, ]*)\)/gi;
@@ -54,7 +55,7 @@ define([
         while (!!node) {
             var tagName = node.tagName.toLowerCase();
             if (!!viewsObject[tagName]) {
-                var presenter = mergeCopy(presenterBase, viewsObject[tagName]._viewList[node.getAttribute('am-index')].presenter);
+                var presenter = merge(presenterBase, viewsObject[tagName]._viewList[node.getAttribute('am-index')].presenter);
                 viewsObject[tagName]._viewList[node.getAttribute('am-index')].presenter = presenter;
                 resolveNestedViewsInheritance(node, presenter, viewsObject, viewsById);
             }
@@ -94,7 +95,7 @@ define([
                 for (var amSrcElement of amSrcAttributes) {
                     var callString = amSrcElement.getAttribute('am-src');
                     var presenter = getPresenter(viewsById, viewsObject, amSrcElement.getAttribute('view-id'), amSrcElement.getAttribute('am-index'));
-                    amSrcElement.setAttribute('src', amaltea.getResult(presenter, callString));
+                    amSrcElement.setAttribute('src', getResult(presenter, callString));
                 }
                 var amClickAttributes = node.querySelectorAll('[am-click]');
                 for (var amClickElement of amClickAttributes) {
@@ -106,7 +107,7 @@ define([
                     }
 
                     var presenter = getPresenter(viewsById, viewsObject, amClickElement.getAttribute('view-id'), amClickElement.getAttribute('am-index'));
-                    var objData = amaltea.getObject(presenter, amClick);
+                    var objData = getObject(presenter, amClick);
                     var fn = objData.object[objData.prop];
                     amClickElement.onclick = fn.bind(presenter);
                 }
@@ -120,13 +121,13 @@ define([
                 for (var oneWayBinding of oneWayBindings) {
                     var callString = oneWayBinding.getAttribute('value');
                     var presenter = getPresenter(viewsById, viewsObject, oneWayBinding.parentElement.getAttribute('view-id'), oneWayBinding.parentElement.getAttribute('am-index'));
-                    oneWayBinding.textContent = amaltea.getResult(presenter, callString);
+                    oneWayBinding.textContent = getResult(presenter, callString);
                 }
 
                 (function () {
                     var twoWayBindings = node.querySelectorAll('[am-value]');
                     for (var twoWayBinding of twoWayBindings) {
-                        var objData = amaltea.getObject(getPresenter(viewsById, viewsObject, twoWayBinding.getAttribute('view-id'), twoWayBinding.getAttribute('am-index')), twoWayBinding.getAttribute('am-value'));
+                        var objData = getObject(getPresenter(viewsById, viewsObject, twoWayBinding.getAttribute('view-id'), twoWayBinding.getAttribute('am-index')), twoWayBinding.getAttribute('am-value'));
                         var value = objData.object[objData.prop];
                         if (typeof value === 'function') {
                             throw new Error("Two data-binding to function is not allowed")
@@ -140,7 +141,7 @@ define([
                             twoWayBinding['on' + event] = function (e) {
                                 var presenter = getPresenter(viewsById, viewsObject, this.getAttribute('view-id'), this.getAttribute('am-index'));
                                 var callString = this.getAttribute('am-value');
-                                var objData = amaltea.getObject(presenter, callString);
+                                var objData = getObject(presenter, callString);
                                 var before = objData.object[objData.prop];
                                 objData.object[objData.prop] = this.value;
                                 var after = objData.object[objData.prop];

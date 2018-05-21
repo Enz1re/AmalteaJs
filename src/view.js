@@ -1,4 +1,4 @@
-define(["src/presenter"], function (presenter) {
+define(["src/presenter"], function (Presenter) {
     "use strict";
 
     function view(viewObject) {
@@ -9,8 +9,12 @@ define(["src/presenter"], function (presenter) {
         }
 
         this.presenter = function (name, presenterFn, dependencies) {
-            this.presenter = new presenter(name, presenterFn, dependencies);
-            return this.presenter;
+			if (this.registeredPresenter) {
+				throw new Error("Presenter for " + this.tagName + " is already registered");
+			}
+			
+            this.registeredPresenter = new Presenter(name, presenterFn, dependencies);
+            return this.registeredPresenter;
         }
     }
 

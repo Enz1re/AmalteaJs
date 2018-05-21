@@ -5,7 +5,8 @@ define([
     "src/am-table",
 
     "src/core/merge",
-], function (AmList, AmForm, AmDynamicForm, AmTable, merge) {
+	"src/core/getObject"
+], function (AmList, AmForm, AmDynamicForm, AmTable, merge, getObject) {
     "use strict";
 
     const classNameRegex = /.?[_a-zA-Z]+[_a-zA-Z0-9-]*/g;
@@ -130,11 +131,11 @@ define([
             }
         }
 
-        var amLists = node.querySelectorAll('[am-list]');
+        var amLists = node.querySelectorAll('am-list');
         for (var elem of amLists) {
-            var listName = elem.getAttribute('am-list');
-            var list = new AmList(elem);
-            if (!this[listName]) {
+            var listName = elem.getAttribute('name');
+            var list = new AmList(elem, presenter);
+            if (!!listName && !this[listName]) {
                 Object.defineProperty(this, listName, {
                     enumerable: false,
                     configurable: false,
@@ -145,11 +146,11 @@ define([
             }
         }
 
-        var amTables = node.querySelectorAll('[am-table]');
+        var amTables = node.querySelectorAll('am-table');
         for (var elem of amTables) {
-            var tableName = elem.getAttribute('am-table');
-            var table = new AmTable(elem);
-            if (!this[tableName]) {
+            var tableName = elem.getAttribute('name');
+            var table = new AmTable(elem, presenter);
+            if (!!tableName && !this[tableName]) {
                 Object.defineProperty(this, tableName, {
                     enumerable: false,
                     configurable: false,
@@ -163,7 +164,7 @@ define([
         // TODO: add data binding
         var simpleForms = node.querySelectorAll('[am-form]');
         for (var formElement of simpleForms) {
-            var modelName = amaltea.getObject(presenter, formElement.getAttribute('am-form')).prop;
+            var modelName = getObject(presenter, formElement.getAttribute('am-form')).prop;
             var form = new AmForm(formElement, modelList.find(function (model) { return model.name === modelName; }).descriptor);
             if (formElement.name) {
                 Object.defineProperty(this, form.name, {
@@ -179,7 +180,7 @@ define([
         // TODO: add data binding
         var dynamicForms = node.querySelectorAll('[am-dynamic-form]');
         for (var formElement of dynamicForms) {
-            var modelName = amaltea.getObject(presenter, formElement.getAttribute('am-dynamic-form')).prop;
+            var modelName = getObject(presenter, formElement.getAttribute('am-dynamic-form')).prop;
             var form = new AmDynamicForm(formElement, modelList.find(function (model) { return model.name === modelName; }).descriptor);
             if (formElement.name) {
                 Object.defineProperty(this, form.name, {
@@ -220,7 +221,7 @@ define([
         };
 
         this.querySelector = function (expr) {
-            return node.querySelectorAll(expr);
+            return asArray(node.querySelectorAll(expr));
         }
     }
 

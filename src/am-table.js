@@ -1,4 +1,4 @@
-define([], function () {
+define(["src/core/getResult"], function (getResult) {
     "use strict";
 
     function AmTableRow(rowData) {
@@ -15,8 +15,8 @@ define([], function () {
                 return {
                     next: function () {
                         return nextIndex < this.length ?
-                        { value: cells[nextIndex++].innerText, done: false } :
-                        { done: true };
+                                { value: cells[nextIndex++].innerText, done: false } :
+                                { done: true };
                     }
                 }
             }
@@ -25,7 +25,7 @@ define([], function () {
 
     AmTableRow.prototype = {
         constructor: AmTableRow
-    }
+    };
 
     function AmTableBody(tbodyData) {
         var rows = tbodyData.getElementsByTagName('tr');
@@ -41,135 +41,175 @@ define([], function () {
                 return {
                     next: function () {
                         return nextIndex < this.length ?
-                        { value: rows[nextIndex++].innerText, done: false } :
-                        { done: true };
+                                { value: rows[nextIndex++].innerText, done: false } :
+                                { done: true };
                     }
                 }
             }
         });
+
+        this.addRow = function (rowArray) {
+            if (!Array.isArray(rowArray)) {
+                throw new Error("rowArray must be an array, not " + typeof rowArray);
+            }
+
+            var newRow = document.createElement('tr');
+            for (var cellData of rowArray) {
+                var newCell = document.createElement('td');
+                newCell.innerText = cellData;
+                newRow.appendChild(newCell);
+            }
+
+            rows.appendChild(newRow);
+        },
+
+        this.removeRow = function (index) {
+            if (rows.length === 0) {
+                return;
+            }
+            if (rows.length <= index || index < 0) {
+                throw new Error("Index should be less than table row number and non-negative.");
+            }
+
+            rows.removeChild(rows[index]);
+        }
     }
 
     AmTableBody.prototype = {
         constructor: AmTableBody,
+    };
 
-        addRow: function (rowArray) {
-            if (!Array.isArray(rowArray)) {
-                throw new Error("rowArray must be an array, not " + typeof rowArray);
-            }
-
-            var newRow = document.createElement('tr');
-            for (var cellData of rowArray) {
-                var newCell = document.createElement('td');
-                newCell.innerText = cellData;
-                newRow.appendChild(newCell);
-            }
-
-            this._rows.appendChild(newRow);
-        },
-
-        removeRow: function (index) {
-            if (this._rows.length === 0) {
-                return;
-            }
-            if (this._rows.length <= index || index < 0) {
-                throw new Error("Index should be less than table row number and non-negative.");
-            }
-
-            this._rows.removeChild(this._rows[index]);
-        }
-    }
-
-    function AmTable(tableElement) {
-        this._table = tableElement;
+    function AmTable(tableElement, presenter) {
+        var _tbodies;
+        var _rows;
+        var table = tableElement;
         var tableContents = Array.prototype.slice.call(tableElement.children);
 
-        if (amaltea.contains(tableContents, 'thead', function (elem) { return elem.tagName === 'THEAD' })) {
-            this._headerRow = tableElement.querySelector('thead').querySelector('tr');
-            this.header = new AmTableRow(this._headerRow);
-        }
-        if (amaltea.contains(tableContents, 'tbody', function (elem) { return elem.tagName === 'TBODY' })) {
-            this._tbodies = tableElement.getElementsByTagName('tbody');
-            if (this._tbodies.length === 1) {
-                this.body = new AmTableBody(this._tbodies[0]);
-                this.bodies = null;
+        var sourceName = tableElement.getAttribute('am-source');
+        if (sourceName) {
+            var source = getResult(presenter, sourceName);
+
+            tableElement.innerHtml = "";
+            tableElement.innerText = "";
+            table = document.createElement('table');
+
+            if (!Array.isArray(source)) {
+                throw new Error("am-table data must be an array, not " + typeof source);
+            }
+
+            var header = document.createElement('thead');
+            for (var td of source[0]) {
+                var cell = document.createElement('td');
+                cell.innerText = td;
+                header.appendChild(cell);
+            }
+
+            this.header = new AmTableRow(header);
+            table.appendChild(header);
+
+            this.rows = [];
+            this.body = null;
+            this.bodies = [];
+            source.splice(0, 1);
+            var containsTBody = Array.isArray(source[0][0]);
+            for (var rowOrBody of source) {
+                if (containsTBody) {
+                    if (!Array.isArray(rowOrBody)) {
+                        throw new Error("body must be an array, not " + typeof tbodyData);
+                    }
+
+                    var tbody = document.createElement('tbody');
+
+                    for (var rowData of rowOrBody) {
+                        if (!Array.isArray(rowData)) {
+                            throw new Error("All body elements must be arrays");
+                        }
+                        var row = document.createElement('tr');
+                        for (var cellData of rowData) {
+                            var cell = document.createElement('td');
+                            cell.innerText = cellData;
+                            row.appendChild(cell);
+                        }
+                        tbody.appendChild(row);
+                        this.rows.push(new AmTableRow(row));
+                    }
+
+                    this.bodies.push(new AmTableBody(tbody));
+                    table.appendChild(tbody);
+                } else {
+                    if (!Array.isArray(rowOrBody)) {
+                        throw new Error("row must be an array, not " + typeof rowOrBody);
+                    }
+        
+                    var newRow = document.createElement('tr');
+                    for (var cellData of rowOrBody) {
+                        var newCell = document.createElement('td');
+                        newCell.innerText = cellData;
+                        newRow.appendChild(newCell);
+                    }
+
+                    this.rows.push(new AmTableRow(newRow));
+                    table.appendChild(newRow);
+                }
+
+                tableElement.appendChild(table);
+            }
+        } else {
+            if (amaltea.contains(tableContents, 'thead', function (elem) { return elem.tagName === 'THEAD' })) {
+                this.header = new AmTableRow(tableElement.querySelector('thead').querySelector('tr'));
+            }
+            if (amaltea.contains(tableContents, 'tbody', function (elem) { return elem.tagName === 'TBODY' })) {
+                _tbodies = tableElement.getElementsByTagName('tbody');
+                if (_tbodies.length === 1) {
+                    this.body = new AmTableBody(_tbodies[0]);
+                    this.bodies = null;
+                } else {
+                    this.body = null;
+                    this.bodies = Array.prototype.slice.call(_tbodies).map(function (tbody) {
+                        return new AmTableBody(tbody);
+                    });
+                }
+                for (var i = 0; i < _tbodies.length; i++) {
+                    this[i] = new AmTableBody(_tbodies[i]);
+                }
+                var nextIndex = 0;
+                Object.defineProperty(this, Symbol.iterator, {
+                    enumerable: false,
+                    value: function () {
+                        return {
+                            next: function () {
+                                return nextIndex < this.length ?
+                                    { value: _tbodies[nextIndex++].innerText, done: false } :
+                                    { done: true };
+                            }
+                        }
+                    }
+                });
             } else {
-                this.body = null;
-                this.bodies = Array.prototype.slice.call(this._tbodies).map(function (tbody) {
-                    return new AmTableBody(tbody);
+                _rows = tableElement.getElementsByTagName('tr');
+                for (var i = 0; i < _rows.length; i++) {
+                    this[i] = new AmTableRow(_rows[i]);
+                }
+                var nextIndex = 0;
+                Object.defineProperty(this, Symbol.iterator, {
+                    enumerable: false,
+                    value: function () {
+                        return {
+                            next: function () {
+                                return nextIndex < this.length ?
+                                    { value: _rows[nextIndex++].innerText, done: false } :
+                                    { done: true };
+                            }
+                        }
+                    }
+                });
+                this.rows = Array.prototype.slice.call(_rows).map(function (row) {
+                    return new AmTableRow(row);
                 });
             }
-            for (var i = 0; i < this._tbodies.length; i++) {
-                this[i] = new AmTableBody(this._tbodies[i]);
-            }
-            var nextIndex = 0;
-            Object.defineProperty(this, Symbol.iterator, {
-                enumerable: false,
-                value: function () {
-                    return {
-                        next: function () {
-                            return nextIndex < this.length ?
-                        { value: this._tbodies[nextIndex++].innerText, done: false } :
-                        { done: true };
-                        }
-                    }
-                }
-            });
-        } else {
-            this._rows = tableElement.getElementsByTagName('tr');
-            for (var i = 0; i < this._rows.length; i++) {
-                this[i] = new AmTableRow(this._rows[i]);
-            }
-            var nextIndex = 0;
-            Object.defineProperty(this, Symbol.iterator, {
-                enumerable: false,
-                value: function () {
-                    return {
-                        next: function () {
-                            return nextIndex < this.length ?
-                        { value: this._rows[nextIndex++].innerText, done: false } :
-                        { done: true };
-                        }
-                    }
-                }
-            });
-            this.rows = Array.prototype.slice.call(this._rows).map(function (row) {
-                return new AmTableRow(row);
-            });
         }
-    }
 
-    AmTable.prototype = {
-        constructor: AmTable,
-
-        init(headerRow, data) {
-            if (!Array.isArray(headerRow)) {
-                throw new Error("headerRow must be an array, not " + typeof headerRow);
-            }
-            if (!Array.isArray(data)) {
-                throw new Error("data must be an array, not " + typeof data);
-            }
-            if (headerRow) {
-                var header = document.createElement('thead');
-                for (var td of headerRow) {
-                    var cell = document.createElement('td');
-                    cell.innerText = td;
-                    header.appendChild(cell);
-                }
-
-                this._table.appendChild(header);
-            }
-
-            var containsTBody = Array.isArray(data[0][0]);
-            for (var rowOrBody of data) {
-                if (amaltea.containsTBody) {
-                    this.addTBody(rowOrBody);
-                } else {
-                    this.addRow(rowOrBody);
-                }
-            }
-        },
-
-        addRow: function (rowArray) {
+        this.addRow = function (rowArray) {
             if (!Array.isArray(rowArray)) {
                 throw new Error("rowArray must be an array, not " + typeof rowArray);
             }
@@ -181,21 +221,27 @@ define([], function () {
                 newRow.appendChild(newCell);
             }
 
-            this._table.appendChild(newRow);
+            table.appendChild(newRow);
+            if (source) {
+                source.push(new AmTableRow(newRow));
+            }
         },
 
-        removeRow: function (index) {
-            if (this._rows.length === 0) {
+        this.removeRow = function (index) {
+            if (_rows.length === 0) {
                 return;
             }
-            if (this._rows.length <= index || index < 0) {
+            if (_rows.length <= index || index < 0) {
                 throw new Error("Index should be less than table row number and non-negative.");
             }
 
-            this._rows.removeChild(this._rows[index]);
+            _rows.removeChild(_rows[index]);
+            if (source) {
+                source.splice(index, 1);
+            }
         },
 
-        addTBody: function (tbodyData) {
+        this.addTBody = function (tbodyData) {
             if (!Array.isArray(tbodyData)) {
                 throw new Error("tbodyData must be an array, not " + typeof tbodyData);
             }
@@ -221,20 +267,23 @@ define([], function () {
             }
 
             this.bodies.push(new AmTableBody(tbody));
-            this._table.appendChild(tbody);
+            table.appendChild(tbody);
+            if (source) {
+                source.push(tbody);
+            }
         },
 
-        removeTBody(index) {
+        this.removeTBody = function (index) {
             if (index) {
-                if (!this.bodies || this._tbodies.length === 0) {
+                if (!this.bodies || _tbodies.length === 0) {
                     return;
                 }
-                if (this._tbodies.length <= index || index < 0) {
+                if (_tbodies.length <= index || index < 0) {
                     throw new Error("Index should be less than tbody number and non-negative.");
                 }
 
                 this.bodies.splice(index, 1);
-                this._tbodies.removeChild(this._tbodies[index]);
+                _tbodies.removeChild(_tbodies[index]);
             } else {
                 if (!!this.body) {
                     this.body = null;
@@ -242,10 +291,18 @@ define([], function () {
                     this.bodies.splice(index, 1);
                 }
 
-                this._tbodies.removeChild(this._tbodies[this._tbodies.length - 1]);
+                _tbodies.removeChild(_tbodies[_tbodies.length - 1]);
+            }
+
+            if (source) {
+                source.splice(index, 1);
             }
         }
     }
+
+    AmTable.prototype = {
+        constructor: AmTable
+    };
 
     return AmTable;
 });

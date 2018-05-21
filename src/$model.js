@@ -1,7 +1,6 @@
 define([
-    "src/core/create",
-    "src/core/mergeArrays"
-], function (create, mergeArrays) {
+    "src/core/create"
+], function (create) {
     "use strict";
 
     function Model(modelObj, viewNode, presenter, parameterName) {

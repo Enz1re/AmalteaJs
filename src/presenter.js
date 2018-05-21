@@ -13,7 +13,7 @@ define(["src/model"], function (model) {
 
             modelDict[name] = new model(name, modelObj);
 
-            return modelDict[name];
+            return this;
         };
 
         Object.defineProperty(this, 'models', {

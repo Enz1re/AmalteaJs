@@ -1,20 +1,47 @@
-define(["src/core/mergeArrays"], function (mergeArrays) {
+define(["src/core/contains"], function (contains) {
     "use strict";
 
-    var merge = function (src, obj) {
+    var merge = function (src, objects) {
         var srcType = typeof src;
-        if (srcType !== typeof obj) {
-            throw new Error("'src' and 'obj' arguments should have the same type");
-        }
-        if (srcType !== 'object') {
-            throw new Error("'src' must be either object or array, not \"" + srcType + "\"");
-        }
-        if (Array.isArray(src) && Array.isArray(obj)) {
-            return mergeArrays(src, obj);
-        }
+        var isSrcArray = Array.isArray(src);
+        var temporaryMerged = isSrcArray ? [] : {};
+        
+        for (var i = 1; i < arguments.length; i++) {
+            var objType = typeof arguments[i];
+            var isObjArray = Array.isArray(arguments[i]);
+            
+            if (srcType !== 'object' || objType !== 'object') {
+                throw new Error("arguments must be either object or array, not \"" + srcType + "\"");
+            }
+            if (srcType !== objType || (isSrcArray ? !isObjArray : isObjArray)) {
+                throw new Error("all arguments should have the same type: " + srcType + ". Met type: " + (isObjArray ? "array" : objType) + " at the position " + i);
+            }
 
-        for (var prop in obj) {
-            src[prop] = obj[prop];
+            if (isSrcArray) {
+                for (var item of arguments[i]) {
+                    if (!contains(src, item) && !contains(temporaryMerged, item)) {
+                        temporaryMerged.push(item);
+                    }
+                }
+            } else {
+                for (var prop in arguments[i]) {
+					if (!(prop in src)) {
+						temporaryMerged[prop] = arguments[i][prop];
+					}
+                }
+            }
+        }
+        
+        if (isSrcArray) {
+            for (var item of temporaryMerged) {
+                if (!contains(src, item)) {
+                    src.push(item);
+                }
+            }
+        } else {
+            for (var prop in temporaryMerged) {
+                src[prop] = temporaryMerged[prop];
+            }
         }
 
         return src;

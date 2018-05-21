@@ -1,11 +1,13 @@
-define([
-    "src/core/merge",
-    "src/core/mergeArrays"
-], function (merge, mergeArrays) {
+define(["src/core/merge"], function (merge, mergeArrays) {
     "use strict";
 
     var shallowCopy = function (obj) {
-        return Array.isArray(obj) ? mergeArrays([], obj) : merge({}, obj);
+		if (typeof obj !== 'object') {
+			var copy = obj;
+			return copy;
+		}
+		
+        return merge((Array.isArray(obj) ? [] : {}), obj);
     }
 
     return shallowCopy;

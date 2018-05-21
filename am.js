@@ -33,6 +33,19 @@ define(["amaltea"], function () {
     var presenter1 = view1.presenter('mainPresenter', function ($view, $model, validator) {
         return {
             id: 0,
+            table: [
+                ['Id', 'Name', 'Role'],
+                [
+                    ['1', 'Kostia', 'Admin'],
+                    ['2', 'Ivan', 'Admin'],
+                    ['3', 'Anton', 'Admin']
+                ],                                 
+                [                          
+                    ['4', 'Sveta', 'User'],
+                    ['5', 'Dmytro', 'User'],
+                    ['6', 'Vlad', 'User']   
+                ]
+            ],
             src: "https://i.ytimg.com/vi/4-oDmlYgrNY/hqdefault.jpg",
 
             onclick1: function (e) {
@@ -61,6 +74,7 @@ define(["amaltea"], function () {
     var presenter2 = view2.presenter('otherPresenter', function ($view) {
         return {
             index: 0,
+            list: [322, 64, 256, 9000, 228],
             src: "http://i0.kym-cdn.com/entries/icons/original/000/020/401/HereDatBoi.jpg",
 
             onclick2: function (e) {

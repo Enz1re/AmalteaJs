@@ -1,7 +1,7 @@
 <div>
 	<button id="button1" am-click="presenter.onclick1" style='font-size:18px;margin-top:30px;margin-left:35px'>Жмяк</button>
 	<p>{presenter.$model.User.name}</p>
-	<table am-table="table2">
+	<am-table name="table2" am-source="presenter.table">
 		<thead>
 			<td>Tobi</td>
 			<td>Pizda</td>
@@ -34,5 +34,5 @@
 				<td>1212</td>
 			</tr>
 		</tbody>
-	</table>
+	</am-table>
 </div>

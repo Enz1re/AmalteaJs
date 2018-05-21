@@ -15,13 +15,12 @@ define([
     "src/core/isNull",
     "src/core/isUndefined",
     "src/core/merge",
-    "src/core/mergeArrays",
-    "src/core/mergeCopy",
+    "src/core/deepCopy",
     "src/core/shallowCopy",
     "src/core/unique",
     "src/core/create"
-], function (compileData, compileView, cache, http, view, Injector, Dependency, contains, containsAny, containsAll,
-             getObject, getResult, isNull, isUndefined, merge, mergeArrays, mergeCopy,
+], function (compileData, compileView, cache, http, view, Injector, Dependency, contains, containsAny,
+             containsAll, getObject, getResult, isNull, isUndefined, merge, deepCopy,
              shallowCopy, unique, create) {
     "use strict";
 
@@ -180,8 +179,8 @@ define([
                 modules[moduleDescriptor.name].views[view.tagName] = create();
                 modules[moduleDescriptor.name].views[view.tagName]._nodes = [];
                 modules[moduleDescriptor.name].views[view.tagName]._viewList = [view];
-                modules[moduleDescriptor.name].presenters[view.tagName] = view.presenter;
-                modules[moduleDescriptor.name].models[view.tagName] = view.presenter.models;
+                modules[moduleDescriptor.name].presenters[view.tagName] = view.registeredPresenter;
+                modules[moduleDescriptor.name].models[view.tagName] = view.registeredPresenter.models;
             }
 
             var moduleDeps = shallowCopy(globalDependencies);
@@ -246,15 +245,9 @@ define([
 
         this.merge = merge;
 
-        this.mergeArrays = mergeArrays;
-
         this.shallowCopy = shallowCopy;
 
-        this.mergeCopy = mergeCopy;
-
-        this.getObject = getObject;
-
-        this.getResult = getResult;
+        this.deepCopy = deepCopy;
 
         this.create = create;
 
